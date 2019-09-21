@@ -1,0 +1,15 @@
+.marked_txt {
+    background: yellow;
+    font-weight: bold;
+    color: blue;
+}
+.unmarked_txt {
+    background: white;
+}
+.incorrect_txt{
+    color: red;
+    font-weight: bold;
+}
+.correct_txt{
+    color: green;
+}
