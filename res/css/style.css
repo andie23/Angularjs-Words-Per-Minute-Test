@@ -1,5 +1,5 @@
 .marked_txt {
-    background: yellow;
+    background: white;
     font-weight: bold;
     color: blue;
 }
@@ -11,5 +11,5 @@
     font-weight: bold;
 }
 .correct_txt{
-    color: green;
+    font-weight: bold;
 }

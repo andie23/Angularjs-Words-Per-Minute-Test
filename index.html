@@ -16,54 +16,46 @@
       <div class="col-sm-12 d-flex justify-content-center">
         <div class="btn-group" role="group" aria-label="Basic example">
           <div class="btn btn-success"> Correct <p/> {{ correctInputCount }} </div>
-            <div class="btn btn-primary">    Characters <p/> {{ charCount }} </div>
-            <div class="btn btn-primary">    Speed <p/> 0</div>
+            <div class="btn btn-dark">    Characters <p/> {{ charCount }} </div>
+            <div class="btn btn-dark">    Speed <p/> 0</div>
             <div class="btn btn-danger">  Wrong <p/> {{ inCorrectInputCount }} </div>
           </div>
         </div>
       </div>
-
       <p/>
       <div class="row">
           <div class="col-sm-12 d-flex justify-content-center">
-              <div class="btn btn-light">
-                <b>Time:</b> 
-                <span id="timer">00:00:00</span>
+              <div class="btn btn-light"> 
+                <b><span id="timer">00:00:00</span></b>
               </div>
           </div>
       </div>
-  
     <p/>
   
     <div class="row">
       <div class="col-md-12 d-flex justify-content-center">
-        <div class="card justify-content-center" style="width:18rem">
+        <div class="card justify-content-center bg-dark text-white" style="width:18rem">
             <div class="card-body text-center">
               <p class="card-text">
-                  <span id="passage_to_copy">
+                  <span id="text_to_copy">
                   
                   </span>
+                  <p/>
+                  <form>
+                      <div class="form-group">
+                          <input type="text" 
+                            id='passage_entry' 
+                            style="text-align:center"
+                            class="form-control border border-primary"
+                            ng-keyup="isComplete()"
+                            ng-keypress="checkInput($event, 'passage_entry')" 
+                            placeholder="Type Here..."
+                            autofocus>
+                      </div>
               </p>
             </div>
         </div>
       </div>
-    </div>
-    
-    <p/>
-    <div class="row">
-        <div class="col-md-12 d-flex justify-content-center">
-          <form>
-              <div class="form-group">
-                  <input type="text" 
-                    id='passage_entry' 
-                    style="text-align:center"
-                    class="form-control border border-primary"
-                    ng-keypress="checkInput($event, 'passage_entry')" 
-                    placeholder="Type Here..."
-                    autofocus>
-              </div>
-          </form>
-        </div>
     </div>
 
       <!-- Optional JavaScript -->
@@ -72,6 +64,7 @@
     <script src="res/bootstrap/js/bootstrap.min.js"></script>
     <script src="res/angular-1.7.5/angular.min.js"></script>
     <script src="app/timer.js"></script>
-    <script src="app/typing_test.js"></script>
+    <script src="app/text.js"></script>
+    <script src="app/main.js"></script>
   </body>
 </html>

@@ -5,45 +5,34 @@ controllers.TypingTestController = function($scope){
     const TEXT_ELEMENT_PREFIX = 'txt_'; 
     var sentence = "After all, you're only an immortal until someone manages to kill you. After that, you were just long-lived.";
     var sentenceArray = sentence.split(' ');
-    var sentenceIndex = 0; 
+    var wordIndex = 0; 
     var typedSentenceArray = [];
     var typedWord = "";
     var initTimer = false;
-
-    buildSentenceArrayAsHtmlElements = function(){
-        for(var i=0; i < sentenceArray.length; ++i){
-            sentenceId = TEXT_ELEMENT_PREFIX + i;
-            $("<span id='" + sentenceId + "'> " + 
-                sentenceArray[i] +
-              " </span>").appendTo('#passage_to_copy');
-        }
-    }()
-
-    getTxtElement = function(index){
-        return $("#" + TEXT_ELEMENT_PREFIX + sentenceIndex);
-    }
-
-    setTxtCssClass = function(element, css){
-        element.attr('class', css);
-    } 
-
-    rmvTxtCssClass = function(css){
-        element = getTxtElement();
-        element.removeClass(css);
-    }
-
-    applyCssToTxt = function(index, css){
-        setTxtCssClass(getTxtElement(sentenceIndex), css);
-    }
+    var isActive = true;
 
     $scope.correctInputCount = 0;
     $scope.inCorrectInputCount = 0;
     $scope.charCount = 0;
+
+    stop = function(){
+        stopTimer();
+        isActive = false;
+    }
+    $scope.isComplete = function(){
+        if (wordIndex >= sentenceArray.length){
+            stop();
+        }
+    }
     $scope.checkInput = function($event, inputElementId) {  
         inputField = $('#' + inputElementId);
         charCode = $event.charCode;
         charTyped = String.fromCharCode(charCode);
-        wordToType = sentenceArray[sentenceIndex];
+        wordToType = sentenceArray[wordIndex];
+        
+        if (!isActive){
+            return;
+        }
 
         if(!initTimer){
             startTimer();
@@ -52,29 +41,33 @@ controllers.TypingTestController = function($scope){
         }
 
         if (charTyped=== " "){
+            //Do not go to the next word if the current one is empty
             if(typedWord.length <= 0){
                 return;
             }
+            //Check if the typed word matches current word
             if (typedWord.trim() === wordToType.trim()){
-                applyCssToTxt(sentenceIndex, 'correct_txt');
+                markTextAsCorrect(wordIndex);
                 ++$scope.correctInputCount;
             }else{
-                applyCssToTxt(sentenceIndex, 'incorrect_txt');
+                markTextAsIncorrect(wordIndex);
                 ++$scope.inCorrectInputCount;
             }
+           
             $scope.charCount += typedWord.length;
-            typedSentenceArray[sentenceIndex] = typedWord;
             typedWord = "";
-            rmvTxtCssClass('marked_txt');
-            ++sentenceIndex;
-            applyCssToTxt(sentenceIndex, 'marked_txt');
+            makeTextInactive(wordIndex);
+            ++wordIndex;
+            markTextAsActive(wordIndex);
             inputField.val('');
         }else{
             typedWord+=charTyped;
         }
     }
-    applyCssToTxt(sentenceIndex, 'marked_txt');
-
+    // show text to be typed
+    buildTextElements(sentenceArray);
+    // initialize first text to be marked
+    markTextAsActive(wordIndex);
 }
 
 typingTest.controller(controllers);

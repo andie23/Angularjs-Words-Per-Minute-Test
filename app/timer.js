@@ -12,9 +12,11 @@ function leadingZero(time) {
 }
 //Reset Everthing
 function stopTimer() {
-    clearInterval(interval);
-    interval = null;
-    timerRunning = false;
+    if (timerRunning) {
+        clearInterval(interval);
+        interval = null;
+        timerRunning = false;
+    }
 }
 
 // Create a Clock
