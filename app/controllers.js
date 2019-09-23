@@ -1,21 +1,21 @@
 TypingTestModule.controller('typingTestController', function($scope, 
     timerService, calculationService, wordsToTypeService, paginationService){
-    const WORDS_PER_VIEW = 25;
-    const TEXT_ELEMENT_PREFIX = 'txt_';
+    const WORDS_PER_VIEW = 25; // Total words to display to the user
+    const TEXT_ELEMENT_PREFIX = 'txt_'; 
     const txtInputElement = $('#typed_entry');
-    let wordLimit = 0;
-    let refTxtArray = [];
-    let typedTxtArray = [];
+    let totalWords = 0; // Words to copy length
+    let refTxtArray = []; // Hold an array of words
+    let typedTxtArray = []; // All user typed entries
     let typedWordIndex = 0;
     let refWordIndex = 0; 
-    let typedWord = "";
     let initTimer = false;
     let isActive = false;
     let page = paginationService;
     
     start = function () {
+       // get the text the user is required to type
        let refTxt = wordsToTypeService.getWordsAsArray();
-       wordLimit = refTxt.length;
+       totalWords = refTxt.length;
         // paginate reference words to be typed
        page.paginate(refTxt , WORDS_PER_VIEW);
        // get current list of words/first page of words
@@ -33,32 +33,38 @@ TypingTestModule.controller('typingTestController', function($scope,
         initTimer = false;
         txtInputElement.attr('disabled', true);
     }
+    $scope.typedWord = "";
     $scope.strTimer = "00:00:00";
-    $scope.timerInMinutes = timerService.getStrTime();
     $scope.correctInputCount = 0;
     $scope.inCorrectInputCount = 0;
     $scope.wpm = 0;
     $scope.accuracy = 0;
     $scope.isComplete = function(){
-        if (typedWordIndex >= wordLimit){
+        if (typedWordIndex >= totalWords){
             stop();
         }
     }
     $scope.checkInput = function($event) {  
         if (isActive === false){ return }
-        console.log(refWordIndex + " vs " + WORDS_PER_VIEW);
         const charCode = $event.which || $event.keyCode;
         const charTyped = String.fromCharCode(charCode);
-        let wordTotype = refTxtArray[refWordIndex].trim();
-        typedWord = typedWord.trim();
         
+        // start the timer as soon as the typing starts
         if(initTimer === false){
             initTimer = true;
-            timerService.start(60000, stop);
+            timerService.start(70000, stop);
         }
-        if (charTyped === " ")
+
+        // Go to the next word if spacebar is clicked
+        if (charTyped === " " && charCode == 32)
         {
+            // trim white spaces from the reference word and typed word
+            let wordTotype =  refTxtArray[refWordIndex].replace(" ", "");
+            typedWord = $scope.typedWord.replace(" ", "");
+            // don't go to the next word if the current word is empty
             if (typedWord.length <= 0){ return }
+            console.log(typedWord + " vs " + wordTotype);
+            // Check if typed word is an exact match with reference word
             if (typedWord === wordTotype){
                 markTextAsCorrect(refWordIndex);
                 $scope.correctInputCount++;
@@ -66,31 +72,28 @@ TypingTestModule.controller('typingTestController', function($scope,
                 markTextAsIncorrect(refWordIndex);
                 $scope.inCorrectInputCount++;
             }
-            
+            // Go to next page if they're more words
             if (refWordIndex + 1 >= WORDS_PER_VIEW){
                 refTxtArray = page.next();
                 buildTextElements(refTxtArray);
                 refWordIndex = 0;
                 markTextAsActive(refWordIndex);
             }else{
+                //Unhighlight current word and mark next word
                 makeTextInactive(refWordIndex);
-                refWordIndex++;
-                markTextAsActive(refWordIndex);
+                markTextAsActive(++refWordIndex);
             }
-            
             typedTxtArray[typedWordIndex] = typedWord;
             typedWord = "";
-            ++typedWordIndex;
             $scope.wpm = calculationService.calcNetWPM(
                 typedTxtArray.length + 1, $scope.inCorrectInputCount, 
                 timerService.getTimeInMinutes()
             );
             $scope.accuracy = calculationService.calcAccuracy(
-                $scope.correctInputCount, refTxtArray.length
+                $scope.correctInputCount, totalWords
             );
             txtInputElement.val('');
-        } else {
-            typedWord += charTyped;
+            ++typedWordIndex;
         }
     }
     start();
