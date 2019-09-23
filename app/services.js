@@ -1,9 +1,9 @@
 TypingTestModule.service('wordsToTypeService', function(){
     this.getWordsAsTxt = function () {
         return "Sometimes I feel like I don't belong anywhere, & it's gonna take so long for me to get to somewhere, Sometimes I feel so heavy hearted, but I can't explain cuz I'm so guarded. But that's a lonely road to travel, and a heavy load to bear. And it's a long, long way to heaven but I gotta get there Can you send an angel? Can you send me an angel...to guide me.";
-    }();
+    };
     this.getWordsAsArray = function() {
-        return this.getWordsAsTxt.split(' ');
+        return this.getWordsAsTxt().split(' ');
     }
 })
 TypingTestModule.service('paginationService', function(){
@@ -29,19 +29,17 @@ TypingTestModule.service('paginationService', function(){
             {
                 if(itemCounter >= itemsPerview)
                 {
-                    this.paginatedList[pageIndex] = group;
                     group = [];
                     itemCounter = 0;
                     pageIndex++;
-                }else{
-                    group[itemCounter] = list[i];
-                    ++itemCounter;
-                }
+                }   
+                group[itemCounter] = list[i];
+                this.paginatedList[pageIndex] = group
+                ++itemCounter;
             }
         }else{
             this.paginatedList[0] = list;
         }
-
         console.log(this.paginatedList);
     }
 })
