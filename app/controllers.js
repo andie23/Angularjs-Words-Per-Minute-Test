@@ -17,13 +17,13 @@ TypingTestModule.controller('typingTestController', function($scope,
        // initially highlight word element
        markTextAsActive(wordIndex);
        isActive = true;
-       txtInputElement.disabled = false;
+       txtInputElement.attr('disabled', false);
     }
     var stop = function () {
         timerService.stop();
         isActive = false;
         initTimer = false;
-        txtInputElement.disabled = true;
+        txtInputElement.attr('disabled', true);
     }
     $scope.strTimer = "00:00:00";
     $scope.timerInMinutes = timerService.getStrTime();
