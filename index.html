@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" ng-app="TypingTest">
+<html lang="en" ng-app="TypingTestModule">
   <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -11,13 +11,13 @@
 
     <title>Texting Championship</title>
   </head>
-  <body ng-controller="TypingTestController">
+  <body ng-controller="typingTestController">
     <div class="row">
       <div class="col-sm-12 d-flex justify-content-center">
         <div class="btn-group" role="group" aria-label="Basic example">
           <div class="btn btn-success"> Correct <p/> {{ correctInputCount }} </div>
-            <div class="btn btn-dark">    Characters <p/> {{ charCount }} </div>
-            <div class="btn btn-dark">    Speed <p/> 0</div>
+            <div class="btn btn-dark">  Accuracy <p/> {{ accuracy }} </div>
+            <div class="btn btn-dark">  Speed (WPM) <p/> {{ wpm }}</div>
             <div class="btn btn-danger">  Wrong <p/> {{ inCorrectInputCount }} </div>
           </div>
         </div>
@@ -26,7 +26,7 @@
       <div class="row">
           <div class="col-sm-12 d-flex justify-content-center">
               <div class="btn btn-light"> 
-                <b><span id="timer">00:00:00</span></b>
+                <b id="timer">00:00:00</b>
               </div>
           </div>
       </div>
@@ -37,18 +37,16 @@
         <div class="card justify-content-center bg-dark text-white" style="width:18rem">
             <div class="card-body text-center">
               <p class="card-text">
-                  <span id="text_to_copy">
-                  
-                  </span>
+                  <span id="text_to_copy"> </span>
                   <p/>
                   <form>
                       <div class="form-group">
                           <input type="text" 
-                            id='passage_entry' 
+                            id='typed_entry' 
                             style="text-align:center"
                             class="form-control border border-primary"
                             ng-keyup="isComplete()"
-                            ng-keypress="checkInput($event, 'passage_entry')" 
+                            ng-keypress="checkInput($event)" 
                             placeholder="Type Here..."
                             autofocus>
                       </div>
@@ -63,8 +61,9 @@
     <script src="res/jquery/jquery-3.3.1.min.js"></script>
     <script src="res/bootstrap/js/bootstrap.min.js"></script>
     <script src="res/angular-1.7.5/angular.min.js"></script>
-    <script src="app/timer.js"></script>
     <script src="app/text.js"></script>
-    <script src="app/main.js"></script>
+    <script src="app/module.js"></script>
+    <script src="app/services.js"></script>
+    <script src="app/controllers.js"></script>
   </body>
 </html>
