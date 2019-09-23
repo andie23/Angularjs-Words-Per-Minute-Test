@@ -15,26 +15,23 @@
     <div class="row">
       <div class="col-sm-12 d-flex justify-content-center">
         <div class="btn-group" role="group" aria-label="Basic example">
-          <div class="btn btn-success"> Correct <p/> {{ correctInputCount }} </div>
-            <div class="btn btn-dark">  Accuracy <p/> {{ accuracy }} </div>
-            <div class="btn btn-dark">  Speed (WPM) <p/> {{ wpm }}</div>
-            <div class="btn btn-danger">  Wrong <p/> {{ inCorrectInputCount }} </div>
+          <div class="btn btn-success"> Correct <p/>     <b> {{ correctInputCount }} </b> </div>
+            <div class="btn btn-dark">  Accuracy <p/>    <b> {{ accuracy }}% </b> </div>
+            <div class="btn btn-dark">  Speed (WPM) <p/> <b> {{ wpm }} </b></div>
+            <div class="btn btn-danger">  Wrong <p/>     <b> {{ inCorrectInputCount }} </b> </div>
           </div>
         </div>
       </div>
-      <p/>
-      <div class="row">
-          <div class="col-sm-12 d-flex justify-content-center">
-              <div class="btn btn-light"> 
-                <b id="timer">00:00:00</b>
-              </div>
-          </div>
-      </div>
-    <p/>
-  
+    <div class="row">
+        <div class="col-sm-12 d-flex justify-content-center">
+            <div class="p-3 mb-2 bg-light"> 
+              <b id="timer">00:00:00</b>
+            </div>
+        </div>
+    </div>
     <div class="row">
       <div class="col-md-12 d-flex justify-content-center">
-        <div class="card justify-content-center bg-dark text-white" style="width:18rem">
+        <div class="card justify-content-center bg-dark text-white" style="width:22rem">
             <div class="card-body text-center">
               <p class="card-text">
                   <span id="text_to_copy"> </span>
@@ -56,6 +53,7 @@
         </div>
       </div>
     </div>
+    <p/>
 
       <!-- Optional JavaScript -->
       <!-- jQuery first, then Popper.js, then Bootstrap JS -->
