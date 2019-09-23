@@ -41,6 +41,7 @@ TypingTestModule.controller('typingTestController', function($scope,
     $scope.accuracy = 0;
     $scope.isComplete = function(){
         if (typedWordIndex >= totalWords){
+            alert("Congratuations, you've completed challenge in time...");
             stop();
         }
     }
@@ -52,7 +53,10 @@ TypingTestModule.controller('typingTestController', function($scope,
         // start the timer as soon as the typing starts
         if(initTimer === false){
             initTimer = true;
-            timerService.start(70000, stop);
+            timerService.start(70000, function(){
+                alert("You're time is up!");
+                stop();
+            });
         }
 
         // Go to the next word if spacebar is clicked
