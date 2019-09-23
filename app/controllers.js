@@ -1,25 +1,33 @@
 TypingTestModule.controller('typingTestController', function($scope, 
-    timerService, calculationService, wordsToTypeService){
+    timerService, calculationService, wordsToTypeService, paginationService){
+    const WORDS_PER_VIEW = 25;
     const TEXT_ELEMENT_PREFIX = 'txt_';
     const txtInputElement = $('#typed_entry');
-    var refTxtArray = [];
-    var typedTxtArray = [];
-    var wordIndex = 0; 
-    var typedWord = "";
-    var initTimer = false;
-    var isActive = false;
-
-    var start = function () {
-       // Get reference sentence/words to be typed by participant
-       refTxtArray = wordsToTypeService.getWordsAsArray();
-       // Wrapp each word as an Html Element with unique id
+    let wordLimit = 0;
+    let refTxtArray = [];
+    let typedTxtArray = [];
+    let typedWordIndex = 0;
+    let refWordIndex = 0; 
+    let typedWord = "";
+    let initTimer = false;
+    let isActive = false;
+    let page = paginationService;
+    
+    start = function () {
+       let refTxt = wordsToTypeService.getWordsAsArray();
+       wordLimit = refTxt.length;
+        // paginate reference words to be typed
+       page.paginate(refTxt , WORDS_PER_VIEW);
+       // get current list of words/first page of words
+       refTxtArray = page.getList();
+       // Wrap each word as an Html Element with unique id
        buildTextElements(refTxtArray);
        // initially highlight word element
-       markTextAsActive(wordIndex);
-       isActive = true;
+       markTextAsActive(refWordIndex);
        txtInputElement.attr('disabled', false);
+       isActive = true;
     }
-    var stop = function () {
+    stop = function () {
         timerService.stop();
         isActive = false;
         initTimer = false;
@@ -32,16 +40,16 @@ TypingTestModule.controller('typingTestController', function($scope,
     $scope.wpm = 0;
     $scope.accuracy = 0;
     $scope.isComplete = function(){
-        if (wordIndex >= refTxtArray.length){
+        if (typedWordIndex >= wordLimit){
             stop();
         }
     }
     $scope.checkInput = function($event) {  
         if (isActive === false){ return }
-        
+        console.log(refWordIndex + " vs " + WORDS_PER_VIEW);
         const charCode = $event.which || $event.keyCode;
         const charTyped = String.fromCharCode(charCode);
-        let wordTotype = refTxtArray[wordIndex].trim();
+        let wordTotype = refTxtArray[refWordIndex].trim();
         typedWord = typedWord.trim();
         
         if(initTimer === false){
@@ -52,16 +60,27 @@ TypingTestModule.controller('typingTestController', function($scope,
         {
             if (typedWord.length <= 0){ return }
             if (typedWord === wordTotype){
-                markTextAsCorrect(wordIndex);
+                markTextAsCorrect(refWordIndex);
                 $scope.correctInputCount++;
             }else{
-                markTextAsIncorrect(wordIndex);
-                $scope.inCorrectInputCount ++;
+                markTextAsIncorrect(refWordIndex);
+                $scope.inCorrectInputCount++;
             }
-            typedTxtArray[wordIndex] = typedWord;
-            makeTextInactive(wordIndex);
+            
+            if (refWordIndex + 1 >= WORDS_PER_VIEW){
+                refTxtArray = page.next();
+                buildTextElements(refTxtArray);
+                refWordIndex = 0;
+                markTextAsActive(refWordIndex);
+            }else{
+                makeTextInactive(refWordIndex);
+                refWordIndex++;
+                markTextAsActive(refWordIndex);
+            }
+            
+            typedTxtArray[typedWordIndex] = typedWord;
             typedWord = "";
-            markTextAsActive(++wordIndex);
+            ++typedWordIndex;
             $scope.wpm = calculationService.calcNetWPM(
                 typedTxtArray.length + 1, $scope.inCorrectInputCount, 
                 timerService.getTimeInMinutes()

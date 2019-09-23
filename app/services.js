@@ -1,9 +1,48 @@
 TypingTestModule.service('wordsToTypeService', function(){
     this.getWordsAsTxt = function () {
-        return "Imagination is more important than knowledge. For knowledge is limited to all we now know and understand, while imagination embraces the entire world, and all there ever will be to know and understand.";
+        return "Sometimes I feel like I don't belong anywhere, & it's gonna take so long for me to get to somewhere, Sometimes I feel so heavy hearted, but I can't explain cuz I'm so guarded. But that's a lonely road to travel, and a heavy load to bear. And it's a long, long way to heaven but I gotta get there Can you send an angel? Can you send me an angel...to guide me.";
     }();
     this.getWordsAsArray = function() {
         return this.getWordsAsTxt.split(' ');
+    }
+})
+TypingTestModule.service('paginationService', function(){
+    this.index = 0;
+    this.paginatedList = [];
+    this.getList = function(){
+        return this.paginatedList[this.index];
+    }
+    this.next = function(){
+        if (this.index + 1 < this.paginatedList.length){
+            ++this.index; 
+        }
+        return this.paginatedList[this.index];
+    }
+    this.paginate = function(list, itemsPerview) {
+        var listLength = list.length;
+        var pageIndex = 0;
+        var itemCounter = 0;
+        var group = [];
+        
+        if (listLength > itemsPerview){
+            for(var i=0; i < listLength; ++i)
+            {
+                if(itemCounter >= itemsPerview)
+                {
+                    this.paginatedList[pageIndex] = group;
+                    group = [];
+                    itemCounter = 0;
+                    pageIndex++;
+                }else{
+                    group[itemCounter] = list[i];
+                    ++itemCounter;
+                }
+            }
+        }else{
+            this.paginatedList[0] = list;
+        }
+
+        console.log(this.paginatedList);
     }
 })
 TypingTestModule.service('calculationService', function(){
@@ -70,6 +109,5 @@ TypingTestModule.service('timerService', function($interval, $timeout){
             this.stop();
             callback();
         } , limit);
-        
     }
 })
