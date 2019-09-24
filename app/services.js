@@ -40,7 +40,6 @@ TypingTestModule.service('paginationService', function(){
         }else{
             this.paginatedList[0] = list;
         }
-        console.log(this.paginatedList);
     }
 })
 TypingTestModule.service('calculationService', function(){
