@@ -7,7 +7,7 @@ function createTxtElement(id, text, parent)
         .appendTo(parent);
 }
 function createTypedTextElement(id, text){
-    createTxtElement(TYPED_TXT_ID_PREFIX + id, text, '#typedd_paragraph');
+    createTxtElement(TYPED_TXT_ID_PREFIX + id, text, '#typed_paragraph_preview');
 }
 function buildTextElements(sentenceArray)
 {
