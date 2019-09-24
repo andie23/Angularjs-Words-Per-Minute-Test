@@ -70,12 +70,14 @@ TypingTestModule.controller('TypingTestController', function($scope,
             // don't go to the next word if the current word is empty
             if (typedWord.length <= 0){ return }
 
+            createTypedTextElement(typedWordIndex, typedWord);
+            
             // Check if typed word is an exact match with reference word
             if (typedWord === wordTotype){
-                markTextAsCorrect(refWordIndex);
+                markTextAsCorrect(typedWordIndex, refWordIndex);
                 $scope.correctInputCount++;
             }else{
-                markTextAsIncorrect(refWordIndex);
+                markTextAsIncorrect(typedWordIndex, refWordIndex);
                 $scope.inCorrectInputCount++;
             }
             // Go to next page if they're more words

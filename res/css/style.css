@@ -1,15 +1,20 @@
 .marked_txt {
-    background: white;
+    background: yellow;
     font-weight: bold;
     color: blue;
 }
-.unmarked_txt {
-    background: white;
+.hidden{
+    visibility: hidden;
 }
 .incorrect_txt{
     color: red;
     font-weight: bold;
 }
 .correct_txt{
+    color: rgba(0, 0, 255, 0.637);
     font-weight: bold;
+}
+.scrollable{
+   overflow-y: scroll;
+   height: 6rem;
 }
