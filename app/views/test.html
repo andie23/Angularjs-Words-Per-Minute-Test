@@ -1,0 +1,63 @@
+<div class="row justify-content-center">
+    <div class="col-sm-12 col-md-6">
+        <table class="table table-sm table-striped table-dark">
+        <thead class="thead-dark">
+            <tr class="text-center">
+            <th scope="col" class="text-success">Correct</th>
+            <th scope="col">Accuracy</th>
+            <th scope="col">Timer</th>
+            <th scope="col">Speed</th>
+            <th scope="col" class="text-danger">Incorrect</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="text-center">
+            <td> <b class="text-success">{{ correctInputCount }}</b> </td>
+            <td> {{ accuracy }}% </td>
+            <td> <b id="timer">00:00:00</b> </td>
+            <td>  {{ wpm }} </td>
+            <td> <b class="text-danger"> {{ inCorrectInputCount }} </b> </td>
+            </tr>
+        </tbody>
+        </table>
+    </div>
+</div>
+<div class="row justify-content-center">
+<div class="col-sm-12 col-md-6">    
+    <div class="card justify-content-center bg-light">
+        <div class="card-body text-center">
+        <p class="card-text">
+            <div id="text_to_copy"  class="font-italic"> </div>
+            <p/>
+            <form>
+                <div class="form-group">
+                    <input type="text" 
+                    id='typed_entry' 
+                    style="text-align:center"
+                    class="form-control border border-primary"
+                    ng-model="typedWord"
+                    ng-keyup="isComplete()"
+                    ng-keypress="checkInput($event)" 
+                    placeholder="Type Here..."
+                    autofocus>
+                </div>
+            </form>
+            </p>
+        </div>
+    </div>
+</div>
+</div>
+<p/>
+
+<div class="row justify-content-center">
+    <div class="col-sm-12 col-md-6">
+        <div class="card">
+        <div class="card-body text-center">
+            <h5 class="card-title text-primary">Typed Paragraph: </h5>
+            <p class="card-text">
+                <div id="typedd_paragraph" class="scrollable"></div>
+            </p>    
+        </div>
+        </div>
+    </div>
+</div>

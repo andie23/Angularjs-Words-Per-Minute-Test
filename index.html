@@ -11,55 +11,14 @@
 
     <title>Texting Championship</title>
   </head>
-  <body ng-controller="typingTestController">
-    <div class="row">
-      <div class="col-sm-12 d-flex justify-content-center">
-        <div class="btn-group" role="group" aria-label="Basic example">
-          <div class="btn btn-success"> Correct <p/>     <b> {{ correctInputCount }} </b> </div>
-            <div class="btn btn-dark">  Accuracy <p/>    <b> {{ accuracy }}% </b> </div>
-            <div class="btn btn-dark">  Speed (WPM) <p/> <b> {{ wpm }} </b></div>
-            <div class="btn btn-danger">  Wrong <p/>     <b> {{ inCorrectInputCount }} </b> </div>
-          </div>
-        </div>
-      </div>
-    <div class="row">
-        <div class="col-sm-12 d-flex justify-content-center">
-            <div class="p-3 mb-2 bg-light"> 
-              <b id="timer">00:00:00</b>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-      <div class="col-md-12 d-flex justify-content-center">
-        <div class="card justify-content-center bg-dark text-white" style="width:22rem">
-            <div class="card-body text-center">
-              <p class="card-text">
-                  <span id="text_to_copy"> </span>
-                  <p/>
-                  <form>
-                      <div class="form-group">
-                          <input type="text" 
-                            id='typed_entry' 
-                            style="text-align:center"
-                            class="form-control border border-primary"
-                            ng-model="typedWord"
-                            ng-keyup="isComplete()"
-                            ng-keypress="checkInput($event)" 
-                            placeholder="Type Here..."
-                            autofocus>
-                      </div>
-              </p>
-            </div>
-        </div>
-      </div>
-    </div>
-    <p/>
-
+  <body>
+    <div ng-view></div>
       <!-- Optional JavaScript -->
       <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="res/jquery/jquery-3.3.1.min.js"></script>
     <script src="res/bootstrap/js/bootstrap.min.js"></script>
     <script src="res/angular-1.7.5/angular.min.js"></script>
+    <script src="res/angular-1.7.5/angular-route.min.js"></script>
     <script src="app/text.js"></script>
     <script src="app/module.js"></script>
     <script src="app/services.js"></script>
