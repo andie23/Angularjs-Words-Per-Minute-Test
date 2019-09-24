@@ -1,8 +1,9 @@
-TypingTestModule.controller('typingTestController', function($scope, 
+TypingTestModule.controller('TypingTestController', function($scope, 
     timerService, calculationService, wordsToTypeService, paginationService){
     const WORDS_PER_VIEW = 25; // Total words to display to the user
     const TEXT_ELEMENT_PREFIX = 'txt_'; 
     const txtInputElement = $('#typed_entry');
+    const refTxtElement = $('#text_to_copy');
     let totalWords = 0; // Words to copy length
     let refTxtArray = []; // Hold an array of words
     let typedTxtArray = []; // All user typed entries
@@ -65,9 +66,10 @@ TypingTestModule.controller('typingTestController', function($scope,
             // trim white spaces from the reference word and typed word
             let wordTotype =  refTxtArray[refWordIndex].replace(" ", "");
             typedWord = $scope.typedWord.replace(" ", "");
+            
             // don't go to the next word if the current word is empty
             if (typedWord.length <= 0){ return }
-            console.log(typedWord + " vs " + wordTotype);
+
             // Check if typed word is an exact match with reference word
             if (typedWord === wordTotype){
                 markTextAsCorrect(refWordIndex);
@@ -78,6 +80,7 @@ TypingTestModule.controller('typingTestController', function($scope,
             }
             // Go to next page if they're more words
             if (refWordIndex + 1 >= WORDS_PER_VIEW){
+                refTxtElement.html("");
                 refTxtArray = page.next();
                 buildTextElements(refTxtArray);
                 refWordIndex = 0;

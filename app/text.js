@@ -1,10 +1,7 @@
-const textToCopy = $('#text_to_copy');
 const TEXT_TO_COPY_ID_PREFIX = "txt_to_copy_"
 
 function buildTextElements(sentenceArray)
 {
-    // clear any html first
-    textToCopy.html("");
     for(var i=0; i < sentenceArray.length; ++i){
         id = TEXT_TO_COPY_ID_PREFIX + i;
         $("<span id='" + id + "'> " + sentenceArray[i] + " </span>")
