@@ -1,15 +1,16 @@
 TypingTestModule.controller('TypingTestController', function($scope, 
     timerService, calculationService, wordsToTypeService, paginationService){
-    const WORDS_PER_VIEW = 25; // Total words to display to the user
-    const TEXT_ELEMENT_PREFIX = 'txt_'; 
-    const txtInputElement = $('#typed_entry');
-    const refTxtElement = $('#text_to_copy');
+    const WORDS_PER_VIEW = 25; // Total words to display in text_to_copy
+    const txtInputElement = $('#typed_entry');  // Input area where words will be typed
+    const refTxtElement = $('#text_to_copy'); // A paragraph a participant is supposed to copy
+    const typedParagraphElement = $('#typed_paragraph_card'); // a view showing what was actually typed
+
     let totalWords = 0; // Words to copy length
     let refTxtArray = []; // Hold an array of words
     let typedTxtArray = []; // All user typed entries
     let typedWordIndex = 0;
     let refWordIndex = 0; 
-    let initTimer = false;
+    let isInit = false;
     let isActive = false;
     let page = paginationService;
     
@@ -26,12 +27,13 @@ TypingTestModule.controller('TypingTestController', function($scope,
        // initially highlight word element
        markTextAsActive(refWordIndex);
        txtInputElement.attr('disabled', false);
+       typedParagraphElement.addClass('hidden');
        isActive = true;
     }
     stop = function () {
         timerService.stop();
         isActive = false;
-        initTimer = false;
+        isInit = false;
         txtInputElement.attr('disabled', true);
     }
     $scope.typedWord = "";
@@ -52,8 +54,9 @@ TypingTestModule.controller('TypingTestController', function($scope,
         const charTyped = String.fromCharCode(charCode);
         
         // start the timer as soon as the typing starts
-        if(initTimer === false){
-            initTimer = true;
+        if(isInit === false){
+            isInit = true;
+            typedParagraphElement.removeClass('hidden');
             timerService.start(70000, function(){
                 alert("You're time is up!");
                 stop();
