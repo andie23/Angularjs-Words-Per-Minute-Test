@@ -60,6 +60,7 @@ TypingTestModule.service('timerService', function($interval, $timeout){
     timerRunning = false;
     timerMins = 0.0;
     intervalPromise = null;
+    timeoutPromise = null;
 
     // Add leading zero to numbers 9
     leadingZero = function (time) {
@@ -94,15 +95,27 @@ TypingTestModule.service('timerService', function($interval, $timeout){
     this.stop = function () {
         if (timerRunning) {
             $interval.cancel(intervalPromise);
+            $timeout.cancel(timeoutPromise);
+            intervalPromise = null;
+            timeoutPromise = null;
             timerRunning = false;
         }
     }
 
+    this.clear = function() {
+        timer = [0, 0, 0, 0];
+        timerRunning = false;
+        timerMins = 0.0;
+        intervalPromise = null;
+        timeoutPromise = null;
+        timerElement.text(this.getStrTime());
+    }
+    
     // Start the timer
     this.start = function (limit, callback) {
         timerRunning = true;
         intervalPromise = $interval(runTimer, 10);
-        $timeout( function (){
+        timeoutPromise = $timeout( function (){
             this.stop();
             callback();
         } , limit);

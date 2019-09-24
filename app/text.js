@@ -7,13 +7,13 @@ function createTxtElement(id, text, parent)
         .appendTo(parent);
 }
 function createTypedTextElement(id, text){
-    createTxtElement(TYPED_TXT_ID_PREFIX + id, text, '#typed_paragraph_preview');
+    createTxtElement(TYPED_TXT_ID_PREFIX + id, text, '#typed_text_elements_container');
 }
 function buildTextElements(sentenceArray)
 {
     for(var i=0; i < sentenceArray.length; ++i){
         id = TEXT_TO_COPY_ID_PREFIX + i;
-        createTxtElement(id, sentenceArray[i], '#text_to_copy');
+        createTxtElement(id, sentenceArray[i], '#to_type_text_elements_container');
     }
 }
 

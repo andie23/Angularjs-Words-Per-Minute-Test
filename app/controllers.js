@@ -1,64 +1,92 @@
 TypingTestModule.controller('TypingTestController', function($scope, 
     timerService, calculationService, wordsToTypeService, paginationService){
-    
+        
     const WORDS_PER_VIEW = 25; // Total words to display in text_to_copy
-    const txtInputElement = $('#typed_entry');  // Input area where words will be typed
-    const refTxtElement = $('#text_to_copy'); // A paragraph a participant is supposed to copy
-    const typedParagraphElement = $('#typed_paragraph'); // a view showing what was actually typed
-    const refParagraphElement = $('#reference_paragraph');
-    const refParagraphTxtBodyElement = $('#reference_paragraph_preview');
-    const testingSectionElement = $('#testing_section'); //section holding the inputbox and paragraph to be copied
-    
-    let totalWords = 0; // Words to copy length
-    let refTxt = '';
-    let refTxtArray = []; // Hold an array of words
-    let typedTxtArray = []; // All user typed entries
-    let typedWordIndex = 0;
-    let refWordIndex = 0; 
-    let isInit = false;
-    let isActive = false;
-    let page = paginationService;
-    
-    start = function () {
+    const wordInputElement = $('#word_input');
+    const typedWordsMainContainer = $("#typed_paragraph_preview_container");
+    const originalParagraphMainContainer = $('#original_paragraph_main_container');
+    const referenceParagraphTextContainer = $('#to_type_text_elements_container'); 
+    const typedWordsContainer = $('#typed_text_elements_container');
+    const originalParagraphTextContainer = $('#original_paragraph_text');
+    const typingTestMainContainer = $('#typing_test_main_container');
+    const continueBtn = $('#continue_btn');
+
+    let totalWords; // from the original paragraph
+    let originalParagraph; // Text from the original
+    let paragraphWordList; // Array of words from paragraph
+    let typedWordList; // Array of words typed
+    let typedIndex; // Current typed word position
+    let paragraphIndex; // Current word position in paragraph
+    let isInit; // When typing is initiated, set to True
+    let isActive; // If typing is active, set to True
+    let page;   // Word pagination object
+
+    $scope.start = function () {
+       // Assign initial values
+       totalWords = 0;
+       originalParagraph = '';
+       paragraphWordList = [];
+       typedWordList = [];
+       typedIndex = 0;
+       paragraphIndex = 0; 
+       isInit = false;
+       isActive = false;
+       page = paginationService;
+       
+       $scope.typedWord = "";
+       $scope.correctInputCount = 0;
+       $scope.inCorrectInputCount = 0;
+       $scope.wpm = 0;
+       $scope.accuracy = 0;
+        
+       // Clear Html elements incase they have previous values..
+       typedWordsContainer.html("");
+       referenceParagraphTextContainer.html("");
+       originalParagraphTextContainer.html("");
+
+       // reset the timer incase it was previously active
+       timerService.clear();
+
        paragraph = wordsToTypeService;
-       refTxt = paragraph.getWordsAsTxt();
-       refTxtArray = paragraph.getWordsAsArray();
-       totalWords = refTxtArray.length;
+       originalParagraph = paragraph.getWordsAsTxt();
+       paragraphWordList = paragraph.getWordsAsArray();
+       totalWords = paragraphWordList.length;
         // paginate reference words to be typed
-       page.paginate(refTxtArray, WORDS_PER_VIEW);
+       page.paginate(paragraphWordList, WORDS_PER_VIEW);
        // get current list of words/first page of words
-       refTxtArray = page.getList();
+       paragraphWordList = page.getList();
        // Wrap each word as an Html Element with unique id
-       buildTextElements(refTxtArray);
+       buildTextElements(paragraphWordList);
        // highlight the first word in the paragraph
-       markTextAsActive(refWordIndex);
-       txtInputElement.attr('disabled', false);
-       typedParagraphElement.addClass('hidden');
-       testingSectionElement.show();
-       refParagraphElement.hide();
+       markTextAsActive(paragraphIndex);
+       continueBtn.addClass('hidden');
+       typedWordsMainContainer.addClass('hidden');
+       typingTestMainContainer.show();
+       originalParagraphMainContainer.hide();
+       wordInputElement.attr('disabled', false);
+       wordInputElement.focus();
        isActive = true;
     }
-    stop = function () {
+
+    $scope.stop = function () {
         timerService.stop();
         isActive = false;
         isInit = false;
-        testingSectionElement.hide();
-        refParagraphElement.removeClass('hidden');
-        refParagraphElement.show();
-        refParagraphTxtBodyElement.html('"' + refTxt + '"');
-        txtInputElement.attr('disabled', true);
+        typingTestMainContainer.hide();
+        originalParagraphMainContainer.removeClass('hidden');
+        originalParagraphMainContainer.show();
+        originalParagraphTextContainer.html('"' + originalParagraph + '"');
+        wordInputElement.attr('disabled', true);
+        continueBtn.removeClass('hidden');
     }
-    $scope.typedWord = "";
-    $scope.correctInputCount = 0;
-    $scope.inCorrectInputCount = 0;
-    $scope.wpm = 0;
-    $scope.accuracy = 0;
+
     $scope.isComplete = function(){
-        if (typedWordIndex >= totalWords){
+        if (typedIndex >= totalWords){
             alert("Congratuations, you've completed challenge in time...");
-            stop();
+            $scope.stop();
         }
     }
+
     $scope.checkInput = function($event) {  
         if (isActive === false){ return }
         const charCode = $event.which || $event.keyCode;
@@ -67,10 +95,10 @@ TypingTestModule.controller('TypingTestController', function($scope,
         // start the timer as soon as the typing starts
         if(isInit === false){
             isInit = true;
-            typedParagraphElement.removeClass('hidden');
+            typedWordsMainContainer.removeClass('hidden');
             timerService.start(6000, function(){
                 alert("You're time is up!");
-                stop();
+                $scope.stop();
             });
         }
 
@@ -78,46 +106,46 @@ TypingTestModule.controller('TypingTestController', function($scope,
         if (charTyped === " " && charCode == 32)
         {
             // trim white spaces from the reference word and typed word
-            let wordTotype =  refTxtArray[refWordIndex].replace(" ", "");
+            let wordTotype =  paragraphWordList[paragraphIndex].replace(" ", "");
             typedWord = $scope.typedWord.replace(" ", "");
             
             // don't go to the next word if the current word is empty
             if (typedWord.length <= 0){ return }
 
-            createTypedTextElement(typedWordIndex, typedWord);
+            createTypedTextElement(typedIndex, typedWord);
             
             // Check if typed word is an exact match with reference word
             if (typedWord === wordTotype){
-                markTextAsCorrect(typedWordIndex, refWordIndex);
+                markTextAsCorrect(typedIndex, paragraphIndex);
                 $scope.correctInputCount++;
             }else{
-                markTextAsIncorrect(typedWordIndex, refWordIndex);
+                markTextAsIncorrect(typedIndex, paragraphIndex);
                 $scope.inCorrectInputCount++;
             }
             // Go to next page if they're more words
-            if (refWordIndex + 1 >= WORDS_PER_VIEW){
-                refTxtElement.html("");
-                refTxtArray = page.next();
-                buildTextElements(refTxtArray);
-                refWordIndex = 0;
-                markTextAsActive(refWordIndex);
+            if (paragraphIndex + 1 >= WORDS_PER_VIEW){
+                referenceParagraphContainer.html("");
+                paragraphWordList = page.next();
+                buildTextElements(paragraphWordList);
+                paragraphIndex = 0;
+                markTextAsActive(paragraphIndex);
             }else{
                 //Unhighlight current word and mark next word
-                makeTextInactive(refWordIndex);
-                markTextAsActive(++refWordIndex);
+                makeTextInactive(paragraphIndex);
+                markTextAsActive(++paragraphIndex);
             }
-            typedTxtArray[typedWordIndex] = typedWord;
+            typedWordList[typedIndex] = typedWord;
             typedWord = "";
             $scope.wpm = calculationService.calcNetWPM(
-                typedTxtArray.length + 1, $scope.inCorrectInputCount, 
+                typedWordList.length + 1, $scope.inCorrectInputCount, 
                 timerService.getTimeInMinutes()
             );
             $scope.accuracy = calculationService.calcAccuracy(
                 $scope.correctInputCount, totalWords
             );
-            txtInputElement.val('');
-            ++typedWordIndex;
+            wordInputElement.val('');
+            ++typedIndex;
         }
     }
-    start();
+    $scope.start();
 })

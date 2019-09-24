@@ -23,40 +23,40 @@
     </div>
 </div>
 
-<div id="testing_section" class="row justify-content-center">
-<div class="col-sm-12 col-md-6">    
-    <div class="card justify-content-center bg-light">
-        <div class="card-body text-center">
-        <p class="card-text">
-            <div id="text_to_copy"  class="font-italic"> </div>
-            <p/>
-            <form>
-                <div class="form-group">
-                    <input type="text" 
-                    id='typed_entry' 
-                    style="text-align:center"
-                    class="form-control border border-primary"
-                    ng-model="typedWord"
-                    ng-keyup="isComplete()"
-                    ng-keypress="checkInput($event)" 
-                    placeholder="Type Here..."
-                    autofocus>
-                </div>
-            </form>
-            </p>
+<div class="row justify-content-center">
+    <div class="col-sm-12 col-md-6">    
+        <div class="card justify-content-center bg-light">
+            <div class="card-body  text-center" id="typing_test_main_container">
+            <p class="card-text">
+                <div id="to_type_text_elements_container"  class="font-italic"> </div>
+                <p/>
+                <form>
+                    <div class="form-group">
+                        <input type="text" 
+                        id='word_input' 
+                        style="text-align:center"
+                        class="form-control border border-primary"
+                        ng-model="typedWord"
+                        ng-keyup="isComplete()"
+                        ng-keypress="checkInput($event)" 
+                        placeholder="Type Here..."
+                        autofocus>
+                    </div>
+                </form>
+                </p>
+            </div>
         </div>
     </div>
-</div>
 </div>
 <p/>
 
 <div class="row justify-content-center">
     <div class="col-sm-12 col-md-6">
-        <div id="typed_paragraph" class="card hidden">
+        <div id="typed_paragraph_preview_container" class="card hidden">
         <div class="card-body text-center">
             <h5 class="card-title text-primary">Typed Paragraph: </h5>
             <p class="card-text">
-                <div id="typed_paragraph_preview" class="scrollable"></div>
+                <div id="typed_text_elements_container" class="scrollable"></div>
             </p>    
         </div>
     </div>
@@ -65,14 +65,19 @@
 <p/>
 <div class="row justify-content-center">
     <div class="col-sm-12 col-md-6">
-        <div id="reference_paragraph" class="card hidden">
+        <div id="original_paragraph_main_container" class="card hidden">
         <div class="card-body text-center">
             <h5 class="card-title text-primary">Original Paragraph: </h5>
             <p class="card-text">
-                <div id="reference_paragraph_preview" class="font-italic correct_txt scrollable"></div>
+                <div id="original_paragraph_text" class="font-italic correct_txt scrollable"></div>
             </p>    
         </div>
         </div>
     </div>
 </div>
 <p/>
+<div class="row justify-content-center">
+    <div class="col-sm-12 col-md-6">
+    <button type="button" id="continue_btn" ng-click="start()" class="btn btn-success hidden">Continue</button>
+</div>
+</div>
