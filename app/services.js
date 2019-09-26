@@ -1,10 +1,24 @@
-TypingTestModule.service('requestService', function(){
-    const BACKEND_API_DOMAIN = '//localhost/texting-championship/textingAppBackend/api/v0.1/';
-    this.getBackendUrl = function(url){
-        return BACKEND_API_DOMAIN + url; 
+TypingTestModule.service('backendService', function($http){
+    const API = '//localhost/texting-championship/textingAppBackend/api/v0.1/';
+    this.getUrl = function(url){
+        return API + url; 
     }
-});
-TypingTestModule.service('authService', function($http, requestService){
+    this.request = function(config, onSuccess, onError){
+        $http(config).then(function(successResponse){
+            onSuccess(successResponse);
+        }, function(errorResponse){
+            onError(errorResponse);
+        })
+    }
+    this.post = function(url, data, onSuccess, onError){
+        this.request({ url: this.getUrl(url), method: 'POST', data: data}, onSuccess, onError);
+    }
+    this.get = function(url, onSuccess, onError) {
+        this.request({ url: this.getUrl(url), method: 'GET'}, onSuccess, onError );
+    }
+})
+
+TypingTestModule.service('authService', function(backendService){
     var participantName = '';
     var refCode = '';
     var isLogged = false;
@@ -24,12 +38,7 @@ TypingTestModule.service('authService', function($http, requestService){
         isLogged = false;
     }
     this.login = function (referenceCode, onSuccess, onError) {
-        $http({
-            method : 'POST',
-            url : requestService.getBackendUrl('auth'),
-            data : {code : referenceCode}
-        })
-        .then(function(response){
+        backendService.post('auth', {code : referenceCode}, function(response){
             if (response.status === 200){
                 onSuccess(response.data);
                 participantName = response.data.fullname;
@@ -44,16 +53,11 @@ TypingTestModule.service('authService', function($http, requestService){
     }
 })
 
-TypingTestModule.service('submissionService', function($http, authService, requestService){
+TypingTestModule.service('submissionService', function(authService, backendService){
     this.submit = function(results, onSuccess, onError){
         if (authService.isLoggedIn()){
             results['code'] = authService.getReferenceCode();
-            $http({
-                method : 'POST',
-                url : requestService.getBackendUrl('submission'),
-                data : results
-            })
-            .then(function(response){
+            backendService.post('submission', results, function(response){
                 if (response.status == 201){
                     onSuccess();
                 }
@@ -66,13 +70,9 @@ TypingTestModule.service('submissionService', function($http, authService, reque
     }
 })
 
-TypingTestModule.service('challengeService', function($http, requestService){
+TypingTestModule.service('challengeService', function(backendService){
     this.init = function(onSuccess, onError){
-        $http({
-            method : 'GET',
-            url : requestService.getBackendUrl('challenge')
-        })
-        .then(function(response){
+        backendService.get('challenge', function(response){
             if (response.status == 200){
                 onSuccess(
                     response.data.title, 
@@ -83,7 +83,7 @@ TypingTestModule.service('challengeService', function($http, requestService){
             }
         }, function(response){
             onError(response.error, response.status);
-        });
+        })
     }
 })
 TypingTestModule.service('paginationService', function(){
