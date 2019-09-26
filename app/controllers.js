@@ -173,7 +173,6 @@ TypingTestModule.controller('TypingTestController', function($scope,
                     typed : typedWord,
                     reference : wordTotype
                 };
-                console.log(mistakeList);
                 markTextAsIncorrect(typedIndex, paragraphIndex);
                 $scope.inCorrectInputCount++;
             }
