@@ -135,12 +135,12 @@ TypingTestModule.service('calculationService', function(){
     }
 })
 TypingTestModule.service('timerService', function($interval, $timeout){
-    timerElement = $('#timer');
     timer = [0, 0, 0, 0];
     timerRunning = false;
     timerMins = 0.0;
     intervalPromise = null;
     timeoutPromise = null;
+    onTimeChange = null;
 
     // Add leading zero to numbers 9
     leadingZero = function (time) {
@@ -153,12 +153,12 @@ TypingTestModule.service('timerService', function($interval, $timeout){
     // Create a Clock
     runTimer = function () {
         let currentTime = leadingZero(timer[0]) + ":" + leadingZero(timer[1]) + ":" + leadingZero(timer[2]);
-        timerElement.text(currentTime);
         timer[3]++;
         timerMins = (timer[3] / 100) / 60;
         timer[0] = Math.floor(timerMins); 
         timer[1] = Math.floor((timer[3] / 100) - (timer[0] * 60));
         timer[2] = Math.floor(timer[3] - (timer[1] * 100) - (timer[0] * 6000));
+        onTimeChange(currentTime, timerMins);
     }
     
     //get timer in words
@@ -188,16 +188,16 @@ TypingTestModule.service('timerService', function($interval, $timeout){
         timerMins = 0.0;
         intervalPromise = null;
         timeoutPromise = null;
-        timerElement.text(this.getStrTime());
     }
     
     // Start the timer
-    this.start = function (limit, callback) {
+    this.start = function (limit, onTimeChange, onTimeout) {
         timerRunning = true;
+        onTimeChange = onTimeChange;
         intervalPromise = $interval(runTimer, 10);
         timeoutPromise = $timeout( function (){
             this.stop();
-            callback();
+            onTimeout();
         } , limit);
     }
 })

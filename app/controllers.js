@@ -69,7 +69,7 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
             'incorrect_words' : $scope.inCorrectInputCount,
             'typed_list' : typedWordList,
             'mistake_list' : mistakeList,
-            'minutes' : timerService.getTimeInMinutes(),
+            'minutes' : $scope.numTime,
             'is_time_out' : isTimeOut
         };
 
@@ -92,6 +92,8 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
        timeLimit = limit * 60000; // convert timelimit from minutes to milliseconds
        totalWords = paragraphWordList.length;
        
+       $scope.strTime = "00:00:00";
+       $scope.numTime = 0.0;
        $scope.title = title;
        $scope.typedWord = "";
        $scope.correctInputCount = 0;
@@ -99,7 +101,7 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
        $scope.wpm = 0;
        $scope.accuracy = 0;
        $scope.grsswpm = 0;
-        
+
        // Clear Html elements incase they have previous values..
        typedWordsContainer.html("");
        referenceParagraphTextContainer.html("");
@@ -152,12 +154,17 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
         // start the timer as soon as the typing starts
         if(isInit === false){
             isInit = true;
-            typedWordsMainContainer.removeClass('hidden');
-            timerService.start(timeLimit, function(){
+            onTimeChange = function(strTime, numTime){
+                $scope.strTime = strTime;
+                $scope.numTime = numTime;
+            }
+            onTimeout = function(){
                 appAlert.error('Your time is up!');
                 $scope.stop();
                 submitResults(1);
-            });
+            }
+            typedWordsMainContainer.removeClass('hidden');
+            timerService.start(timeLimit, onTimeChange, onTimeout);
         }
 
         // Go to the next word if spacebar is clicked
@@ -199,11 +206,10 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
             typedWordList[typedIndex] = typedWord;
             typedWord = "";
             $scope.grsswpm = calculationService.calcGrossWPM(
-                typedWordList.length + 1, timerService.getTimeInMinutes()
+                typedWordList.length + 1, $scope.numTime
             )
             $scope.wpm = calculationService.calcNetWPM(
-                typedWordList.length + 1, $scope.inCorrectInputCount, 
-                timerService.getTimeInMinutes()
+                typedWordList.length + 1, $scope.inCorrectInputCount, $scope.numTime
             );
             $scope.accuracy = calculationService.calcAccuracy(
                 $scope.correctInputCount, totalWords
