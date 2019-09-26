@@ -1,7 +1,7 @@
 TypingTestModule.controller('MenuController', function($scope, requestService, authService){
     $scope.participantName = authService.getParticipantName();
 })
-TypingTestModule.controller('LoginController', function($scope, requestService, authService){
+TypingTestModule.controller('LoginController', function($scope, $location, requestService, authService){
     if(authService.isLoggedIn()){
         authService.loggout();
         appAlert.success('Good goodbye!');
@@ -15,7 +15,7 @@ TypingTestModule.controller('LoginController', function($scope, requestService, 
                 $scope.referenceCode,
                 function(data){
                     appAlert.success('Welcome '+ data.fullname);
-                    window.location = requestService.getAppUrl('menu');
+                    $location.url('/menu');
                 }, 
                 function(error){
                     appAlert.error(error);
@@ -24,9 +24,9 @@ TypingTestModule.controller('LoginController', function($scope, requestService, 
         }
     }
 })
-TypingTestModule.controller('TypingTestController', function($scope, 
-    timerService, calculationService, challengeService, paginationService,
-    requestService, submissionService){
+TypingTestModule.controller('TypingTestController', function($scope, $location, 
+    timerService, calculationService, challengeService, paginationService, 
+    submissionService){
         
     const WORDS_PER_VIEW = 25; // Total words to display in text_to_copy
     const wordInputElement = $('#word_input');
@@ -206,7 +206,7 @@ TypingTestModule.controller('TypingTestController', function($scope,
     }
     challengeService.init($scope.start, function(error, status){
             appAlert.error(error);
-            window.location = requestService.getAppUrl('menu');
+            $location.url('/menu');
         }
     );
 })

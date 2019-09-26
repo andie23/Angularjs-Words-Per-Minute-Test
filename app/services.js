@@ -1,10 +1,5 @@
 TypingTestModule.service('requestService', function(){
-    const APP_DOMAIN = '//localhost/texting-championship/textingAppClient/#!/';
     const BACKEND_API_DOMAIN = '//localhost/texting-championship/textingAppBackend/api/v0.1/';
-    
-    this.getAppUrl = function(url){
-        return APP_DOMAIN + url;
-    }
     this.getBackendUrl = function(url){
         return BACKEND_API_DOMAIN + url; 
     }
