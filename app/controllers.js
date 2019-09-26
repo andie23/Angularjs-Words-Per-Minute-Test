@@ -1,7 +1,7 @@
-TypingTestModule.controller('MenuController', function($scope, requestService, authService){
+TypingTestModule.controller('MenuController', function($scope, authService){
     $scope.participantName = authService.getParticipantName();
 })
-TypingTestModule.controller('LoginController', function($scope, $location, requestService, authService){
+TypingTestModule.controller('LoginController', function($scope, $location, authService){
     if(authService.isLoggedIn()){
         authService.loggout();
         appAlert.success('Good goodbye!');
