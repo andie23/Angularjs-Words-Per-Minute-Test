@@ -1,3 +1,11 @@
+TypingTestModule.run(function($rootScope, $location, authService){
+    $rootScope.$on('$routeChangeStart', function(event) {
+        if (!authService.isLoggedIn()){
+            appAlert.error("I won't trust you until I know your Reference Code..");
+            $location.url('/');
+        }
+    })
+})
 TypingTestModule.controller('MenuController', function($scope, authService){
     $scope.participantName = authService.getParticipantName();
 })
