@@ -13,7 +13,7 @@
         <tbody>
             <tr class="text-center">
             <td> <b class="text-success">{{ correctInputCount }}</b> </td>
-            <td> {{ accuracy }}% </td>
+            <td> {{ accuracy }} </td>
             <td> <b id="timer">00:00:00</b> </td>
             <td>  {{ wpm }} </td>
             <td> <b class="text-danger"> {{ inCorrectInputCount }} </b> </td>
@@ -28,6 +28,7 @@
         <div class="card justify-content-center bg-light">
             <div class="card-body  text-center" id="typing_test_main_container">
             <p class="card-text">
+                <small> {{ title }}</small>
                 <div id="to_type_text_elements_container"  class="font-italic"> </div>
                 <p/>
                 <form>
@@ -78,6 +79,6 @@
 <p/>
 <div class="row justify-content-center">
     <div class="col-sm-12 col-md-6">
-    <button type="button" id="continue_btn" ng-click="start()" class="btn btn-success hidden">Continue</button>
+    <a href="#!/" id="continue_btn" class="btn btn-success" role="button" aria-pressed="true">Continue</a>
 </div>
 </div>
