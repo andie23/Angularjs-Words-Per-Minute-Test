@@ -182,10 +182,11 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
                 markTextAsCorrect(typedIndex, paragraphIndex);
                 $scope.correctInputCount++;
             }else{
-                mistakeList[typedIndex] = {
-                    typed : typedWord,
-                    reference : wordTotype
-                };
+                mistakeList.push({
+                    'wordIndex' : typedIndex,
+                    'typed' : typedWord,
+                    'reference' : wordTotype
+                });
                 markTextAsIncorrect(typedIndex, paragraphIndex);
                 $scope.inCorrectInputCount++;
             }
