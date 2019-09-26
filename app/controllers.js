@@ -1,5 +1,32 @@
+TypingTestModule.controller('MenuController', function($scope, requestService, authService){
+    $scope.participantName = authService.getParticipantName();
+})
+TypingTestModule.controller('LoginController', function($scope, requestService, authService){
+    if(authService.isLoggedIn()){
+        authService.loggout();
+        appAlert.success('Good goodbye!');
+    }
+    $scope.referenceCode = "";
+    $scope.authenticate = function(){
+        if($scope.referenceCode.length <= 0){
+            appAlert.error('Cannot submit empty reference code!');
+        }else{
+            authService.login(
+                $scope.referenceCode,
+                function(data){
+                    appAlert.success('Welcome '+ data.fullname);
+                    window.location = requestService.getAppUrl('menu');
+                }, 
+                function(error){
+                    appAlert.error(error);
+                }
+            )
+        }
+    }
+})
 TypingTestModule.controller('TypingTestController', function($scope, 
-    timerService, calculationService, wordsToTypeService, paginationService){
+    timerService, calculationService, challengeService, paginationService,
+    requestService, submissionService){
         
     const WORDS_PER_VIEW = 25; // Total words to display in text_to_copy
     const wordInputElement = $('#word_input');
@@ -15,29 +42,55 @@ TypingTestModule.controller('TypingTestController', function($scope,
     let originalParagraph; // Text from the original
     let paragraphWordList; // Array of words from paragraph
     let typedWordList; // Array of words typed
+    let mistakeList;
     let typedIndex; // Current typed word position
     let paragraphIndex; // Current word position in paragraph
     let isInit; // When typing is initiated, set to True
     let isActive; // If typing is active, set to True
     let page;   // Word pagination object
+    let timeLimit;
+    let challengeID;
 
-    $scope.start = function () {
-       // Assign initial values
-       totalWords = 0;
-       originalParagraph = '';
-       paragraphWordList = [];
+    submitResults = function(isTimeOut){
+        let data = {
+            'challenge_id' : challengeID,
+            'net_wpm': $scope.wpm,
+            'gross_wpm': $scope.grsswpm,
+            'accuracy' : $scope.accuracy,
+            'correct_words' : $scope.correctInputCount,
+            'incorrect_words' : $scope.inCorrectInputCount,
+            'typed_list' : typedWordList,
+            'mistake_list' : mistakeList,
+            'minutes' : timerService.getTimeInMinutes(),
+            'is_time_out' : isTimeOut
+        };
+
+        submissionService.submit(data, function(){}, function(e, c){
+            appAlert.error('Failed to submit result scores!');
+        });
+    }
+
+    $scope.start = function (title, passage, limit, id) {
+       challengeID = id;
        typedWordList = [];
+       mistakeList = [];
        typedIndex = 0;
+       paragraphWordList = passage.split(' ');
+       originalParagraph = passage;
        paragraphIndex = 0; 
        isInit = false;
        isActive = false;
        page = paginationService;
+       timeLimit = limit * 60000; // convert timelimit from minutes to milliseconds
+       totalWords = paragraphWordList.length;
        
+       $scope.title = title;
        $scope.typedWord = "";
        $scope.correctInputCount = 0;
        $scope.inCorrectInputCount = 0;
        $scope.wpm = 0;
        $scope.accuracy = 0;
+       $scope.grsswpm = 0;
         
        // Clear Html elements incase they have previous values..
        typedWordsContainer.html("");
@@ -46,12 +99,7 @@ TypingTestModule.controller('TypingTestController', function($scope,
 
        // reset the timer incase it was previously active
        timerService.clear();
-
-       paragraph = wordsToTypeService;
-       originalParagraph = paragraph.getWordsAsTxt();
-       paragraphWordList = paragraph.getWordsAsArray();
-       totalWords = paragraphWordList.length;
-        // paginate reference words to be typed
+       // paginate reference words to be typed
        page.paginate(paragraphWordList, WORDS_PER_VIEW);
        // get current list of words/first page of words
        paragraphWordList = page.getList();
@@ -82,8 +130,9 @@ TypingTestModule.controller('TypingTestController', function($scope,
 
     $scope.isComplete = function(){
         if (typedIndex >= totalWords){
-            alert("Congratuations, you've completed challenge in time...");
+            appAlert.success('You have completed the passage in Time!');
             $scope.stop();
+            submitResults(0);
         }
     }
 
@@ -96,9 +145,10 @@ TypingTestModule.controller('TypingTestController', function($scope,
         if(isInit === false){
             isInit = true;
             typedWordsMainContainer.removeClass('hidden');
-            timerService.start(6000, function(){
-                alert("You're time is up!");
+            timerService.start(timeLimit, function(){
+                appAlert.error('Your time is up!');
                 $scope.stop();
+                submitResults(1);
             });
         }
 
@@ -119,12 +169,17 @@ TypingTestModule.controller('TypingTestController', function($scope,
                 markTextAsCorrect(typedIndex, paragraphIndex);
                 $scope.correctInputCount++;
             }else{
+                mistakeList[typedIndex] = {
+                    typed : typedWord,
+                    reference : wordTotype
+                };
+                console.log(mistakeList);
                 markTextAsIncorrect(typedIndex, paragraphIndex);
                 $scope.inCorrectInputCount++;
             }
             // Go to next page if they're more words
             if (paragraphIndex + 1 >= WORDS_PER_VIEW){
-                referenceParagraphContainer.html("");
+                referenceParagraphTextContainer.html("");
                 paragraphWordList = page.next();
                 buildTextElements(paragraphWordList);
                 paragraphIndex = 0;
@@ -136,6 +191,9 @@ TypingTestModule.controller('TypingTestController', function($scope,
             }
             typedWordList[typedIndex] = typedWord;
             typedWord = "";
+            $scope.grsswpm = calculationService.calcGrossWPM(
+                typedWordList.length + 1, timerService.getTimeInMinutes()
+            )
             $scope.wpm = calculationService.calcNetWPM(
                 typedWordList.length + 1, $scope.inCorrectInputCount, 
                 timerService.getTimeInMinutes()
@@ -147,5 +205,9 @@ TypingTestModule.controller('TypingTestController', function($scope,
             ++typedIndex;
         }
     }
-    $scope.start();
+    challengeService.init($scope.start, function(error, status){
+            appAlert.error(error);
+            window.location = requestService.getAppUrl('menu');
+        }
+    );
 })

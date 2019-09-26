@@ -1,9 +1,94 @@
-TypingTestModule.service('wordsToTypeService', function(){
-    this.getWordsAsTxt = function () {
-        return "Sometimes I feel like I don't belong anywhere, & it's gonna take so long for me to get to somewhere, Sometimes I feel so heavy hearted, but I can't explain cuz I'm so guarded. But that's a lonely road to travel, and a heavy load to bear. And it's a long, long way to heaven but I gotta get there Can you send an angel? Can you send me an angel...to guide me.";
-    };
-    this.getWordsAsArray = function() {
-        return this.getWordsAsTxt().split(' ');
+TypingTestModule.service('requestService', function(){
+    const APP_DOMAIN = '//localhost/texting-championship/textingAppClient/#!/';
+    const BACKEND_API_DOMAIN = '//localhost/texting-championship/textingAppBackend/api/v0.1/';
+    
+    this.getAppUrl = function(url){
+        return APP_DOMAIN + url;
+    }
+    this.getBackendUrl = function(url){
+        return BACKEND_API_DOMAIN + url; 
+    }
+});
+TypingTestModule.service('authService', function($http, requestService){
+    var participantName = '';
+    var refCode = '';
+    var isLogged = false;
+
+    this.getParticipantName = function(){
+        return participantName;
+    }
+    this.getReferenceCode = function() {
+        return refCode;
+    }
+    this.isLoggedIn = function (){
+        return isLogged;
+    }
+    this.loggout = function (){
+        participantName =  '';
+        refCode = '';
+        isLogged = false;
+    }
+    this.login = function (referenceCode, onSuccess, onError) {
+        $http({
+            method : 'POST',
+            url : requestService.getBackendUrl('auth'),
+            data : {code : referenceCode}
+        })
+        .then(function(response){
+            if (response.status === 200){
+                onSuccess(response.data);
+                participantName = response.data.fullname;
+                refCode = referenceCode;
+                isLogged = true
+            }
+        }, function(response){
+            if (response.status === 404) {
+                onError(response.data['error']);
+            }
+        });
+    }
+})
+
+TypingTestModule.service('submissionService', function($http, authService, requestService){
+    this.submit = function(results, onSuccess, onError){
+        if (authService.isLoggedIn()){
+            results['code'] = authService.getReferenceCode();
+            $http({
+                method : 'POST',
+                url : requestService.getBackendUrl('submission'),
+                data : results
+            })
+            .then(function(response){
+                if (response.status == 201){
+                    onSuccess();
+                }
+            }, function(response){
+                onError(response.error, response.status);
+            })
+        }else{
+            onError("User not loggedIn", 404);
+        }
+    }
+})
+
+TypingTestModule.service('challengeService', function($http, requestService){
+    this.init = function(onSuccess, onError){
+        $http({
+            method : 'GET',
+            url : requestService.getBackendUrl('challenge')
+        })
+        .then(function(response){
+            if (response.status == 200){
+                onSuccess(
+                    response.data.title, 
+                    response.data.passage, 
+                    response.data.limit, 
+                    response.data.id
+                )
+            }
+        }, function(response){
+            onError(response.error, response.status);
+        });
     }
 })
 TypingTestModule.service('paginationService', function(){
