@@ -21,7 +21,6 @@ TypingTestModule.controller('LoginController', function($scope, $location, authS
             authService.login(
                 $scope.referenceCode,
                 function(data){
-                    appAlert.success('Welcome '+ data.fullname);
                     $location.url('/menu');
                 }, 
                 function(error){
