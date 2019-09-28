@@ -46,7 +46,6 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
     const typedWordsContainer = $('#typed_text_elements_container');
     const originalParagraphTextContainer = $('#original_paragraph_text');
     const typingTestMainContainer = $('#typing_test_main_container');
-    const continueBtn = $('#continue_btn');
 
     let totalWords; // from the original paragraph
     let originalParagraph; // Text from the original
@@ -56,7 +55,6 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
     let typedIndex; // Current typed word position
     let paragraphIndex; // Current word position in paragraph
     let isInit; // When typing is initiated, set to True
-    let isActive; // If typing is active, set to True
     let page;   // Word pagination object
     let timeLimit;
     let challengeID;
@@ -89,11 +87,11 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
        originalParagraph = passage;
        paragraphIndex = 0; 
        isInit = false;
-       isActive = false;
        page = paginationService;
        timeLimit = limit * 60000; // convert timelimit from minutes to milliseconds
        totalWords = paragraphWordList.length;
        
+       $scope.isActive = false;
        $scope.strTime = "00:00:00";
        $scope.numTime = 0.0;
        $scope.title = title;
@@ -121,25 +119,23 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
        buildTextElements(paragraphWordList);
        // highlight the first word in the paragraph
        markTextAsActive(paragraphIndex);
-       continueBtn.addClass('hidden');
        typedWordsMainContainer.addClass('hidden');
        typingTestMainContainer.show();
        originalParagraphMainContainer.hide();
        wordInputElement.attr('disabled', false);
        wordInputElement.focus();
-       isActive = true;
+       $scope.isActive = true;
     }
 
     $scope.stop = function () {
         timerService.stop();
-        isActive = false;
+        $scope.isActive = false;
         isInit = false;
         typingTestMainContainer.hide();
         originalParagraphMainContainer.removeClass('hidden');
         originalParagraphMainContainer.show();
         originalParagraphTextContainer.html('"' + originalParagraph + '"');
         wordInputElement.attr('disabled', true);
-        continueBtn.removeClass('hidden');
     }
 
     $scope.isComplete = function(){
@@ -151,7 +147,7 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
     }
 
     $scope.checkInput = function($event) {  
-        if (isActive === false){ return }
+        if ($scope.isActive === false){ return }
         const charCode = $event.which || $event.keyCode;
         const charTyped = String.fromCharCode(charCode);
         
