@@ -92,6 +92,9 @@ TypingTestModule.service('paginationService', function(){
     this.getList = function(){
         return this.paginatedList[this.index];
     }
+    this.resetIndex = function(){
+        this.index = 0;
+    }
     this.next = function(){
         if (this.index + 1 < this.paginatedList.length){
             ++this.index; 
