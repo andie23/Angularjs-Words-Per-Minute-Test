@@ -11,7 +11,6 @@ TypingTestModule.controller('MenuController', function($scope, authService){
 TypingTestModule.controller('LoginController', function($scope, $location, authService){
     if(authService.isLoggedIn()){
         authService.loggout();
-        appAlert.success('Good goodbye!');
     }
     $scope.referenceCode = "";
     $scope.authenticate = function(){
@@ -21,7 +20,8 @@ TypingTestModule.controller('LoginController', function($scope, $location, authS
             authService.login(
                 $scope.referenceCode,
                 function(data){
-                    $location.url('/menu');
+                    $location.url('/typing-test');
+                    appAlert.success('Welcome ' + data.fullname);
                 }, 
                 function(error){
                     appAlert.error(error);
@@ -105,6 +105,8 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
        referenceParagraphTextContainer.html("");
        originalParagraphTextContainer.html("");
 
+       //start at the first index of the page
+       page.resetIndex();
        // reset the timer incase it was previously active
        timerService.clear();
        // paginate reference words to be typed
