@@ -12,18 +12,22 @@ TypingTestModule.controller('LoginController', function($scope, $location, authS
     if(authService.isLoggedIn()){
         authService.loggout();
     }
+    $scope.isRequesting = false;
     $scope.referenceCode = "";
     $scope.authenticate = function(){
         if($scope.referenceCode.length <= 0){
             appAlert.error('Cannot submit empty reference code!');
         }else{
+            $scope.isRequesting = true;
             authService.login(
                 $scope.referenceCode,
                 function(data){
+                    $scope.isRequesting = false;
                     $location.url('/typing-test');
                     appAlert.success('Welcome ' + data.fullname);
                 }, 
                 function(error){
+                    $scope.isRequesting = false;
                     appAlert.error(error);
                 }
             )
