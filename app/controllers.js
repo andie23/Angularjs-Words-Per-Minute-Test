@@ -22,7 +22,6 @@ TypingTestModule.controller('LoginController', function($scope, $location, authS
             authService.login(
                 $scope.referenceCode,
                 function(data){
-                    $scope.isRequesting = false;
                     $location.url('/typing-test');
                     appAlert.success('Welcome ' + data.fullname);
                 }, 
