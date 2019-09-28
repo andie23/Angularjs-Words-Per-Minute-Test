@@ -27,16 +27,16 @@ TypingTestModule
                                 },
                                 requestError: function(rejection){
                                         $rootScope.activeCalls -= 1;
-                                        return rejection;
+                                        return $q.reject(rejection);
                                 },
                                 response: function(response){
                                         $rootScope.activeCalls -=1;
                                         return response;
                                 },
-                                responseError: function(rejection){
+                                responseError: function(rejection) {
                                         $rootScope.activeCalls -=1;
-                                        return rejection;
+                                        return $q.reject(rejection);
                                 }
                         }
                 })
-        }])
+        }]);
