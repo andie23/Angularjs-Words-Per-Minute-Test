@@ -123,6 +123,10 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
        $scope.isReady = true;
     }
 
+    $scope.deterCopyAndPaste = function(){
+        wordInputElement.focus();
+    }
+
     $scope.submitResults = function(){
         $scope.isSubmitting = true;
         submissionService.submit(resultData, function(){
