@@ -40,7 +40,7 @@ TypingTestModule.controller('LoginController', function($scope, $location, authS
 })
 TypingTestModule.controller('TypingTestController', function($scope, $location, 
     timerService, calculationService, challengeService, paginationService, 
-    submissionService){
+    submissionService, authService){
         
     const WORDS_PER_VIEW = 25; // Total words to display in text_to_copy
     const wordInputElement = $('#word_input');
@@ -91,6 +91,7 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
        timeLimit = limit * 60000; // convert timelimit from minutes to milliseconds
        totalWords = paragraphWordList.length;
       
+       $scope.participantName = authService.getParticipantName() || 'Anonymous';
        $scope.isInit = false;
        $scope.isReady = false;
        $scope.originalParagraph = passage;
