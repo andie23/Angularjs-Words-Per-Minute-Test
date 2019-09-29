@@ -32,7 +32,6 @@ TypingTestModule.controller('LoginController', function($scope, $location, authS
                 }, 
                 function(error){
                     $scope.isRequesting = false;
-                    appAlert.error(error);
                 }
             )
         }
@@ -131,7 +130,6 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
             $location.url('/');
         }, function(error){
             $scope.isSubmitting = false;
-            appAlert.error('Failed to save your progress. Please try again..');
         });
     }
 
@@ -220,7 +218,6 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
         }
     }
     challengeService.init($scope.start, function(error, status){
-            appAlert.error(error);
             $location.url('/');
         }
     );

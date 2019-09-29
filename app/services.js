@@ -4,11 +4,16 @@ TypingTestModule.service('backendService', function($http){
         return API + url; 
     }
     this.request = function(config, onSuccess, onError){
-        $http(config).then(function(successResponse){
-            onSuccess(successResponse);
-        }, function(errorResponse){
-            onError(errorResponse);
-        })
+        try{
+            $http(config).then(function(successResponse){
+                onSuccess(successResponse);
+            }, function(errorResponse){
+                onError(errorResponse);
+            })
+        }catch(error){
+            console.log(error);
+            onError(error);
+        }
     }
     this.post = function(url, data, onSuccess, onError){
         this.request({ url: this.getUrl(url), method: 'POST', data: data}, onSuccess, onError);
@@ -39,20 +44,16 @@ TypingTestModule.service('authService', function(backendService){
     }
     this.login = function (referenceCode, onSuccess, onError) {
         backendService.post('auth', {code : referenceCode}, function(response){
-            if (response.status === 200){
+            if (response.data.error === undefined){
                 onSuccess(response.data);
                 participantName = response.data.fullname;
                 refCode = referenceCode;
                 isLogged = true
+            }else{
+                onError()
             }
         }, function(response){
-            if (response.status === 404) {
-                if(response.data.error !== undefined){
-                    onError(response.data['error']);
-                }else{
-                    onError('Server not available..');
-                }
-            }
+                onError();
         });
     }
 })
@@ -66,10 +67,8 @@ TypingTestModule.service('submissionService', function(authService, backendServi
                     onSuccess();
                 }
             }, function(response){
-                onError(response);
+                onError();
             })
-        }else{
-            onError("User not loggedIn", 404);
         }
     }
 })
@@ -77,19 +76,22 @@ TypingTestModule.service('submissionService', function(authService, backendServi
 TypingTestModule.service('challengeService', function(backendService){
     this.init = function(onSuccess, onError){
         backendService.get('challenge', function(response){
-            if (response.status == 200){
+            if (response.data.error === undefined){
                 onSuccess(
                     response.data.title, 
                     response.data.passage, 
                     response.data.limit, 
                     response.data.id
                 )
+            }else{
+                onError();
             }
         }, function(response){
-            onError(response.error, response.status);
+            onError();
         })
     }
 })
+
 TypingTestModule.service('paginationService', function(){
     this.index = 0;
     this.paginatedList = [];

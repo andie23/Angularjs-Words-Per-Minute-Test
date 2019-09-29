@@ -31,10 +31,20 @@ TypingTestModule
                                 },
                                 response: function(response){
                                         $rootScope.activeCalls -=1;
+                                        if (response.data.error !== undefined){
+                                                appAlert.error(response.data.error);
+                                        }
                                         return response;
                                 },
                                 responseError: function(rejection) {
                                         $rootScope.activeCalls -=1;
+                                        if (rejection.status === -1){
+                                                appAlert.error("Failed to connect to server/ You're offline");
+                                        }else if(rejection.status >= 400 && rejection.status <= 499){
+                                                appAlert.error("Resource not found/Authorization Error..");
+                                        }else if(rejection.status >= 500 && rejection.status <= 599){
+                                                appAlert.error("An error has occured while processing request");
+                                        }
                                         return $q.reject(rejection);
                                 }
                         }
