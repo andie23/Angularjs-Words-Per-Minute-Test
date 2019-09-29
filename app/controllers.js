@@ -1,5 +1,11 @@
-TypingTestModule.run(function($rootScope, $location, authService){
+TypingTestModule.run(function($rootScope, $timeout, $interval, $location, authService){
     $rootScope.$on('$routeChangeStart', function(event) {
+        if ($rootScope.timeoutPromise !== undefined){
+            $timeout.cancel($rootScope.timeoutPromise);
+        }
+        if ($rootScope.intervalPromise !== undefined){
+            $interval.cancel($rootScope.intervalPromise);
+        }
         if (!authService.isLoggedIn()){
             $location.url('/');
         }

@@ -141,12 +141,12 @@ TypingTestModule.service('calculationService', function(){
         return Math.floor((validCount / invalidCount) * 100);
     }
 })
-TypingTestModule.service('timerService', function($interval, $timeout){
+TypingTestModule.service('timerService', function($rootScope, $interval, $timeout){
     timer = [0, 0, 0, 0];
     timerRunning = false;
     timerMins = 0.0;
-    intervalPromise = null;
-    timeoutPromise = null;
+    $rootScope.intervalPromise =undefined;
+    $rootScope.timeoutPromise = undefined;
     onTimeChange = null;
 
     // Add leading zero to numbers 9
@@ -181,10 +181,10 @@ TypingTestModule.service('timerService', function($interval, $timeout){
     //Reset Everthing
     this.stop = function () {
         if (timerRunning) {
-            $interval.cancel(intervalPromise);
-            $timeout.cancel(timeoutPromise);
-            intervalPromise = null;
-            timeoutPromise = null;
+            $interval.cancel($rootScope.intervalPromise);
+            $timeout.cancel($rootScope.timeoutPromise);
+            $rootScope.intervalPromise =undefined;
+            $rootScope.timeoutPromise = undefined;
             timerRunning = false;
         }
     }
@@ -193,16 +193,16 @@ TypingTestModule.service('timerService', function($interval, $timeout){
         timer = [0, 0, 0, 0];
         timerRunning = false;
         timerMins = 0.0;
-        intervalPromise = null;
-        timeoutPromise = null;
+        $rootScope.intervalPromise = undefined;
+        $rootScope.timeoutPromise = undefined;
     }
     
     // Start the timer
     this.start = function (limit, onTimeChange, onTimeout) {
         timerRunning = true;
         onTimeChange = onTimeChange;
-        intervalPromise = $interval(runTimer, 10);
-        timeoutPromise = $timeout( function (){
+        $rootScope.intervalPromise = $interval(runTimer, 10);
+        $rootScope.timeoutPromise = $timeout( function (){
             this.stop();
             onTimeout();
         } , limit);
