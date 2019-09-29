@@ -23,7 +23,6 @@ TypingTestModule.controller('LoginController', function($scope, $location, authS
                 $scope.referenceCode,
                 function(data){
                     $location.url('/typing-test');
-                    appAlert.success('Welcome ' + data.fullname);
                 }, 
                 function(error){
                     $scope.isRequesting = false;
@@ -40,10 +39,8 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
     const WORDS_PER_VIEW = 25; // Total words to display in text_to_copy
     const wordInputElement = $('#word_input');
     const typedWordsMainContainer = $("#typed_paragraph_preview_container");
-    const originalParagraphMainContainer = $('#original_paragraph_main_container');
     const referenceParagraphTextContainer = $('#to_type_text_elements_container'); 
     const typedWordsContainer = $('#typed_text_elements_container');
-    const originalParagraphTextContainer = $('#original_paragraph_text');
     const typingTestMainContainer = $('#typing_test_main_container');
 
     let totalWords; // from the original paragraph
@@ -53,7 +50,6 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
     let mistakeList;
     let typedIndex; // Current typed word position
     let paragraphIndex; // Current word position in paragraph
-    let isInit; // When typing is initiated, set to True
     let page;   // Word pagination object
     let timeLimit;
     let challengeID;
@@ -85,11 +81,13 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
        paragraphWordList = passage.split(' ');
        originalParagraph = passage;
        paragraphIndex = 0; 
-       isInit = false;
        page = paginationService;
        timeLimit = limit * 60000; // convert timelimit from minutes to milliseconds
        totalWords = paragraphWordList.length;
-       
+      
+       $scope.isInit = false;
+       $scope.isReady = false;
+       $scope.originalParagraph = passage;
        $scope.isActive = false;
        $scope.strTime = "00:00:00";
        $scope.numTime = 0.0;
@@ -104,8 +102,6 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
        // Clear Html elements incase they have previous values..
        typedWordsContainer.html("");
        referenceParagraphTextContainer.html("");
-       originalParagraphTextContainer.html("");
-
        //start at the first index of the page
        page.resetIndex();
        // reset the timer incase it was previously active
@@ -118,28 +114,17 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
        buildTextElements(paragraphWordList);
        // highlight the first word in the paragraph
        markTextAsActive(paragraphIndex);
-       typedWordsMainContainer.addClass('hidden');
-       typingTestMainContainer.show();
-       originalParagraphMainContainer.hide();
-       wordInputElement.attr('disabled', false);
-       wordInputElement.focus();
        $scope.isActive = true;
+       $scope.isReady = true;
     }
 
     $scope.stop = function () {
         timerService.stop();
         $scope.isActive = false;
-        isInit = false;
-        typingTestMainContainer.hide();
-        originalParagraphMainContainer.removeClass('hidden');
-        originalParagraphMainContainer.show();
-        originalParagraphTextContainer.html('"' + originalParagraph + '"');
-        wordInputElement.attr('disabled', true);
     }
 
     $scope.isComplete = function(){
         if (typedIndex >= totalWords){
-            appAlert.success('You have completed the passage in Time!');
             $scope.stop();
             submitResults(0);
         }
@@ -151,8 +136,8 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
         const charTyped = String.fromCharCode(charCode);
         
         // start the timer as soon as the typing starts
-        if(isInit === false){
-            isInit = true;
+        if($scope.isInit === false){
+            $scope.isInit = true;
             onTimeChange = function(strTime, numTime){
                 $scope.strTime = strTime;
                 $scope.numTime = numTime;
@@ -162,7 +147,6 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
                 $scope.stop();
                 submitResults(1);
             }
-            typedWordsMainContainer.removeClass('hidden');
             timerService.start(timeLimit, onTimeChange, onTimeout);
         }
 
