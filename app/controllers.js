@@ -124,7 +124,6 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
     }
 
     $scope.submitResults = function(){
-        console.log('Submitting results');
         $scope.isSubmitting = true;
         submissionService.submit(resultData, function(){
             $location.url('/');
