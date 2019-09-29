@@ -59,9 +59,10 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
     let page;   // Word pagination object
     let timeLimit;
     let challengeID;
+    let resultData;
 
-    submitResults = function(isTimeOut){
-        let data = {
+    setResultData = function(isTimeOut){
+        resultData = {
             'challenge_id' : challengeID,
             'net_wpm': $scope.wpm,
             'gross_wpm': $scope.grsswpm,
@@ -73,10 +74,6 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
             'minutes' : $scope.numTime,
             'is_time_out' : isTimeOut
         };
-
-        submissionService.submit(data, function(){}, function(e, c){
-            appAlert.error('Failed to submit result scores!');
-        });
     }
 
     $scope.start = function (title, passage, limit, id) {
@@ -90,7 +87,8 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
        page = paginationService;
        timeLimit = limit * 60000; // convert timelimit from minutes to milliseconds
        totalWords = paragraphWordList.length;
-      
+       resultData = {}
+
        $scope.participantName = authService.getParticipantName() || 'Anonymous';
        $scope.isInit = false;
        $scope.isReady = false;
@@ -105,6 +103,7 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
        $scope.wpm = 0;
        $scope.accuracy = 0;
        $scope.grsswpm = 0;
+       $scope.isSubmitting = false;
 
        // Clear Html elements incase they have previous values..
        typedWordsContainer.html("");
@@ -125,6 +124,17 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
        $scope.isReady = true;
     }
 
+    $scope.submitResults = function(){
+        console.log('Submitting results');
+        $scope.isSubmitting = true;
+        submissionService.submit(resultData, function(){
+            $location.url('/');
+        }, function(error){
+            $scope.isSubmitting = false;
+            appAlert.error('Failed to save your progress. Please try again..');
+        });
+    }
+
     $scope.stop = function () {
         timerService.stop();
         $scope.isActive = false;
@@ -133,7 +143,7 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
     $scope.isComplete = function(){
         if (typedIndex >= totalWords){
             $scope.stop();
-            submitResults(0);
+            setResultData(0);
         }
     }
 
@@ -152,7 +162,7 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
             onTimeout = function(){
                 appAlert.error('Your time is up!');
                 $scope.stop();
-                submitResults(1);
+                setResultData(1);
             }
             timerService.start(timeLimit, onTimeChange, onTimeout);
         }
@@ -211,7 +221,7 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
     }
     challengeService.init($scope.start, function(error, status){
             appAlert.error(error);
-            $location.url('/menu');
+            $location.url('/');
         }
     );
 })

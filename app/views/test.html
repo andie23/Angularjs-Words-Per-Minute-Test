@@ -68,12 +68,12 @@
     <p/>
     <div class="row justify-content-center">
         <div class="col-sm-12 col-md-6">
-            <div id="original_paragraph_main_container" ng-hide="isActive">
+            <div class="card" ng-hide="isActive">
             <div class="card-body text-center">
                 <h5 class="card-title text-primary">Original Paragraph: </h5>
                 <p class="card-text">
                     <div class="font-italic correct_txt scrollable"> {{ originalParagraph }}</div>
-                </p>    
+                </p>
             </div>
             </div>
         </div>
@@ -81,12 +81,12 @@
     <p/>
     <div class="row justify-content-center">
         <div class="col-sm-12 col-md-6">
-            <a href="#!/" 
+            <button 
                 ng-hide="isActive"
-                class="btn btn-dark" 
-                style="width:100%" 
-                role="button" 
-                aria-pressed="true">Logout</a>
+                ng-disabled = "isSubmitting"
+                ng-click="submitResults()"
+                class="btn btn-primary">Save and Exit
+            </button>
         </div>
     </div>
 </div>

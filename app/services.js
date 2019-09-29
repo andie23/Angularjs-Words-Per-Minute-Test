@@ -66,7 +66,7 @@ TypingTestModule.service('submissionService', function(authService, backendServi
                     onSuccess();
                 }
             }, function(response){
-                onError(response.error, response.status);
+                onError(response);
             })
         }else{
             onError("User not loggedIn", 404);
