@@ -47,7 +47,11 @@ TypingTestModule.service('authService', function(backendService){
             }
         }, function(response){
             if (response.status === 404) {
-                onError(response.data['error']);
+                if(response.data.error !== undefined){
+                    onError(response.data['error']);
+                }else{
+                    onError('Server not available..');
+                }
             }
         });
     }
