@@ -64,7 +64,7 @@ TypingTestModule.service('submissionService', function(authService, backendServi
             results['code'] = authService.getReferenceCode();
             backendService.post('submission', results, function(response){
                 if (response.status == 201){
-                    onSuccess();
+                    onSuccess(response.data.score);
                 }
             }, function(response){
                 onError();
@@ -133,7 +133,7 @@ TypingTestModule.service('paginationService', function(){
 })
 TypingTestModule.service('calculationService', function(){
     this.calcGrossWPM = function(inputCount, minutes){
-        return (inputCount) / minutes;
+        return inputCount / minutes;
     }
     this.calcNetWPM = function(inputCount, incorrectInputCount, minutes){
         grossWPM = this.calcGrossWPM(inputCount, minutes);
@@ -144,43 +144,21 @@ TypingTestModule.service('calculationService', function(){
     }
 })
 TypingTestModule.service('timerService', function($rootScope, $interval, $timeout){
-    timer = [0, 0, 0, 0];
+    seconds = 0;
     timerRunning = false;
-    timerMins = 0.0;
     $rootScope.intervalPromise =undefined;
     $rootScope.timeoutPromise = undefined;
     onTimeChange = null;
 
-    // Add leading zero to numbers 9
-    leadingZero = function (time) {
-        if (time <= 9) {
-            time = "0" + time;
-        }
-        return time;
+    runTimer = function () {
+        ++seconds;
+        onTimeChange(Math.floor(seconds/10), seconds / 10 / 60);
     }
 
-    // Create a Clock
-    runTimer = function () {
-        let currentTime = leadingZero(timer[0]) + ":" + leadingZero(timer[1]) + ":" + leadingZero(timer[2]);
-        timer[3]++;
-        timerMins = (timer[3] / 100) / 60;
-        timer[0] = Math.floor(timerMins); 
-        timer[1] = Math.floor((timer[3] / 100) - (timer[0] * 60));
-        timer[2] = Math.floor(timer[3] - (timer[1] * 100) - (timer[0] * 6000));
-        onTimeChange(currentTime, timerMins);
-    }
-    
-    //get timer in words
-    this.getStrTime = function () {
-       return leadingZero(timer[0]) + ":" + leadingZero(timer[1]) + ":" + leadingZero(timer[2]);
-    }
-    
-    // get numberical number
     this.getTimeInMinutes = function() {
-        return timerMins;
+        return seconds / 10 / 60;
     }
     
-    //Reset Everthing
     this.stop = function () {
         if (timerRunning) {
             $interval.cancel($rootScope.intervalPromise);
@@ -192,9 +170,8 @@ TypingTestModule.service('timerService', function($rootScope, $interval, $timeou
     }
 
     this.clear = function() {
-        timer = [0, 0, 0, 0];
+        seconds = 0;
         timerRunning = false;
-        timerMins = 0.0;
         $rootScope.intervalPromise = undefined;
         $rootScope.timeoutPromise = undefined;
     }
@@ -203,7 +180,7 @@ TypingTestModule.service('timerService', function($rootScope, $interval, $timeou
     this.start = function (limit, onTimeChange, onTimeout) {
         timerRunning = true;
         onTimeChange = onTimeChange;
-        $rootScope.intervalPromise = $interval(runTimer, 10);
+        $rootScope.intervalPromise = $interval(runTimer, 100);
         $rootScope.timeoutPromise = $timeout( function (){
             this.stop();
             onTimeout();

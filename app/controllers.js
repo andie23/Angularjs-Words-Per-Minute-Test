@@ -56,7 +56,8 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
     let typedIndex; // Current typed word position
     let paragraphIndex; // Current word position in paragraph
     let page;   // Word pagination object
-    let timeLimit;
+    let limitInMilsecs;
+    let limitInSecs;
     let challengeID;
     let resultData;
 
@@ -70,7 +71,8 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
             'incorrect_words' : $scope.inCorrectInputCount,
             'typed_list' : typedWordList,
             'mistake_list' : mistakeList,
-            'minutes' : $scope.numTime,
+            'minutes' : $scope.curMinutes,
+            'seconds' : $scope.curSeconds,
             'is_time_out' : isTimeOut
         };
     }
@@ -84,17 +86,19 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
        originalParagraph = passage;
        paragraphIndex = 0; 
        page = paginationService;
-       timeLimit = limit * 60000; // convert timelimit from minutes to milliseconds
+       limitInSecs = limit * 60;
+       limitInMilsecs = limit * 60000; // convert limitInMilsecs from minutes to milliseconds
        totalWords = paragraphWordList.length;
        resultData = {}
-
+      
+       $scope.timeLimit = limitInSecs;
        $scope.participantName = authService.getParticipantName() || 'Anonymous';
        $scope.isInit = false;
        $scope.isReady = false;
        $scope.originalParagraph = passage;
        $scope.isActive = false;
-       $scope.strTime = "00:00:00";
-       $scope.numTime = 0.0;
+       $scope.curSeconds = 0;
+       $scope.curMinutes = 0.0;
        $scope.title = title;
        $scope.typedWord = "";
        $scope.correctInputCount = 0;
@@ -129,7 +133,8 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
 
     $scope.submitResults = function(){
         $scope.isSubmitting = true;
-        submissionService.submit(resultData, function(){
+        submissionService.submit(resultData, function(score){
+            appAlert.success('Your score: ' + score + ' points!');
             $location.url('/');
         }, function(error){
             $scope.isSubmitting = false;
@@ -156,16 +161,16 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
         // start the timer as soon as the typing starts
         if($scope.isInit === false){
             $scope.isInit = true;
-            onTimeChange = function(strTime, numTime){
-                $scope.strTime = strTime;
-                $scope.numTime = numTime;
+            onTimeChange = function(seconds, minutes){
+                $scope.curSeconds = seconds;
+                $scope.curMinutes = minutes;
             }
             onTimeout = function(){
                 appAlert.error('Your time is up!');
                 $scope.stop();
                 setResultData(1);
             }
-            timerService.start(timeLimit, onTimeChange, onTimeout);
+            timerService.start(limitInMilsecs, onTimeChange, onTimeout);
         }
 
         // Go to the next word if spacebar is clicked
@@ -208,10 +213,10 @@ TypingTestModule.controller('TypingTestController', function($scope, $location,
             typedWordList[typedIndex] = typedWord;
             typedWord = "";
             $scope.grsswpm = calculationService.calcGrossWPM(
-                typedWordList.length + 1, $scope.numTime
+                typedWordList.length, $scope.curMinutes
             )
             $scope.wpm = calculationService.calcNetWPM(
-                typedWordList.length + 1, $scope.inCorrectInputCount, $scope.numTime
+                $scope.correctInputCount, $scope.inCorrectInputCount, $scope.curMinutes
             );
             $scope.accuracy = calculationService.calcAccuracy(
                 $scope.correctInputCount, totalWords
