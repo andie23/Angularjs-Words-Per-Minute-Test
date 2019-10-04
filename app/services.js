@@ -73,9 +73,9 @@ TypingTestModule.service('submissionService', function(authService, backendServi
     }
 })
 
-TypingTestModule.service('challengeService', function(backendService){
+TypingTestModule.service('challengeService', function(authService, backendService){
     this.init = function(onSuccess, onError){
-        backendService.get('challenge', function(response){
+        backendService.post('challenge', {'code' : authService.getReferenceCode()}, function(response){
             if (response.data.error === undefined){
                 onSuccess(
                     response.data.title, 
